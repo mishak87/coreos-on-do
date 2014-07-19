@@ -7,6 +7,12 @@ cd $(dirname $0)
 stage1()
 {
     cd /root
+
+    if [[ -z "$CHANNEL" ]]; then
+        CHANNEL=alpha
+    fi
+    echo "$CHANNEL" > channel
+
     cat > cloud-config.yaml << EOF
 #cloud-config
 
@@ -87,8 +93,8 @@ EOF
           command: start
 EOF
 
-    wget http://alpha.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz
-    wget http://alpha.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz
+    wget http://$(cat channel).release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz
+    wget http://$(cat channel).release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz
 
     cp $0 stage2.sh
     chmod +x stage2.sh
@@ -119,7 +125,7 @@ stage3()
 
     wget --no-check-certificate https://raw.github.com/coreos/init/master/bin/coreos-install
     chmod +x coreos-install
-    ./coreos-install -C alpha -d /dev/vda -c cloud-config.yaml
+    ./coreos-install -C $(cat channel) -d /dev/vda -c cloud-config.yaml
 
     cgpt repair /dev/vda
     parted -s -- /dev/vda mkpart DOROOT ext4 -500M -0
