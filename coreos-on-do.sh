@@ -78,7 +78,6 @@ EOF
 EOF
 
         if [[ -n "$METADATA" ]]; then
-
             cat >> cloud-config.yaml << EOF
         metadata: ${METADATA}
 EOF
